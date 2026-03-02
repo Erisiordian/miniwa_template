@@ -1,0 +1,10 @@
+.wrap{display:grid;place-items:center;min-height:calc(100vh - 120px);padding:20px}
+.auth{max-width:420px;width:100%}
+h2{margin:0 0 6px}
+.muted{color:rgba(231,235,255,.75);margin:0 0 14px}
+.label{display:block;font-size:12px;color:rgba(231,235,255,.7);margin-top:10px;margin-bottom:6px}
+.full{width:100%;margin-top:14px}
+.link{color:rgba(231,235,255,.9);text-decoration:underline}
+.small{font-size:13px;margin-top:12px}
+.err{margin-top:10px;color:#ffd0d0}
+.ok{margin-top:10px;color:#d7ffd0}

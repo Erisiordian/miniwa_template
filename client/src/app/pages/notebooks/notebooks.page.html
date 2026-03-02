@@ -1,0 +1,22 @@
+<div class="page">
+  <div class="head"><h2>Notebooks</h2></div>
+  <div class="card">
+    <div class="row">
+      <input class="input" placeholder="New notebook title…" [ngModel]="title()" (ngModelChange)="title.set($event)" />
+      <button class="btn primary" (click)="create()" [disabled]="loading()">Create</button>
+      <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
+    </div>
+    <div class="muted small">Export/Import su u backendu: GET /api/notebooks/:id/export i POST /api/notebooks/import</div>
+  </div>
+  <div class="card" *ngIf="error()">{{ error() }}</div>
+  <div class="card">
+    <div class="nb" *ngFor="let nb of items()">
+      <div class="left">
+        <div class="title">{{ nb.title }}</div>
+        <div class="muted small">{{ nb.updatedAt | date:'short' }}</div>
+      </div>
+      <button class="btn" (click)="remove(nb._id)" [disabled]="loading()">Delete</button>
+    </div>
+    <div class="empty" *ngIf="items().length===0">No notebooks yet.</div>
+  </div>
+</div>

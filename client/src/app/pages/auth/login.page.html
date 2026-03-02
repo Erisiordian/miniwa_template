@@ -1,0 +1,17 @@
+<div class="wrap">
+  <div class="card auth">
+    <h2>Login</h2>
+    <p class="muted">Use your account to access History and Notebooks.</p>
+
+    <label class="label">Email</label>
+    <input class="input" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+
+    <label class="label">Password</label>
+    <input class="input" type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" />
+
+    <div class="err" *ngIf="error()">{{ error() }}</div>
+
+    <button class="btn primary full" (click)="submit()" [disabled]="loading()">Login</button>
+    <div class="muted small">No account? <a routerLink="/register" class="link">Register</a></div>
+  </div>
+</div>

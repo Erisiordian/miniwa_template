@@ -1,0 +1,10 @@
+.page{display:grid;gap:12px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h2{margin:0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row .input{flex:1;min-width:240px}
+.muted{color:rgba(231,235,255,.75)}
+.small{font-size:13px}
+.nb{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.title{font-weight:700}
+.empty{padding:14px 0;color:rgba(231,235,255,.70)}

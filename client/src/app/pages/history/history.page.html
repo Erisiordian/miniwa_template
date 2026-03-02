@@ -1,0 +1,22 @@
+<div class="page">
+  <div class="head">
+    <h2>History</h2>
+    <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
+  </div>
+
+  <div class="card" *ngIf="error()">{{ error() }}</div>
+  <div class="card" *ngIf="loading()">Loading…</div>
+
+  <div class="card" *ngIf="!loading() && !error()">
+    <div class="row header">
+      <div>When</div><div>Module</div><div>Query</div><div>Status</div>
+    </div>
+    <div class="row" *ngFor="let it of items()">
+      <div class="muted">{{ it.createdAt | date:'short' }}</div>
+      <div class="pill">{{ it.module }}</div>
+      <div class="mono">{{ it.rawQuery }}</div>
+      <div [class.bad]="it.status==='error'">{{ it.status }}</div>
+    </div>
+    <div class="empty" *ngIf="items().length===0">No history yet.</div>
+  </div>
+</div>
