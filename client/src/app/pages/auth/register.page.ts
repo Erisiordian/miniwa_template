@@ -1,28 +1,33 @@
 import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-import { API_BASE } from '../../core/api';
+import { Router } from '@angular/router';
+import { AuthApi } from '../../core/auth.api';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './register.page.html',
-  styleUrl: './auth.page.css',
+  styleUrl: './register.page.css',
 })
-export class RegisterPage{
-  email=signal(''); password=signal('');
-  loading=signal(false); error=signal<string|null>(null); ok=signal<string|null>(null);
-  constructor(private http: HttpClient, private router: Router){}
-  async submit(){
-    this.error.set(null); this.ok.set(null); this.loading.set(true);
-    try{
-      await firstValueFrom(this.http.post(`${API_BASE}/auth/register`, { email: this.email(), password: this.password() }));
-      this.ok.set('Account created. You can login now.');
-      setTimeout(()=>this.router.navigateByUrl('/login'), 600);
-    }catch(e:any){
+export class RegisterPage {
+  email = signal('');
+  password = signal('');
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+  constructor(private api: AuthApi, private router: Router) {}
+
+  async register() {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      await this.api.register(this.email().trim(), this.password());
+      this.router.navigateByUrl('/history');
+    } catch (e: any) {
       this.error.set(e?.error?.message || e?.message || 'Register failed');
-    }finally{ this.loading.set(false); }
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

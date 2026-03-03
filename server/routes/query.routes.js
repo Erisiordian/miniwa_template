@@ -1,16 +1,20 @@
 const express = require("express");
-const auth = require("../middleware/auth");
+const optionalAuth = require("../middleware/optionalAuth");
 const { runQuery } = require("../services/query.service");
+
 const router = express.Router();
 
-router.post("/run", auth, async (req, res) => {
-  const query = String(req.body?.query || "").trim();
+// POST /api/query  body: { query: "..." }  ili { input: "..." }
+router.post(["/", "/run"], optionalAuth, async (req, res) => {
+  const query = String(req.body?.query || req.body?.input || "").trim();
   if (!query) return res.status(400).json({ message: "query required" });
+
   try {
-    const doc = await runQuery({ userId: req.user.sub, rawQuery: query });
+    const userId = req.user?.sub || null;
+    const doc = await runQuery({ userId, rawQuery: query });
     res.json(doc);
-  } catch (err) {
-    res.status(500).json({ message: "Query failed", error: err.message });
+  } catch (e) {
+    res.status(500).json({ message: "Query failed", error: e.message });
   }
 });
 

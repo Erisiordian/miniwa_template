@@ -1,18 +1,18 @@
-<div class="wrap">
-  <div class="card auth">
-    <h2>Register</h2>
-    <p class="muted">Create an account for your MiniWA workspace.</p>
+<div class="page">
+  <h2>Register</h2>
 
-    <label class="label">Email</label>
-    <input class="input" type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
+  <div *ngIf="error()" class="error">{{ error() }}</div>
 
-    <label class="label">Password</label>
-    <input class="input" type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" />
+  <label>Email</label>
+  <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" />
 
-    <div class="ok" *ngIf="ok()">{{ ok() }}</div>
-    <div class="err" *ngIf="error()">{{ error() }}</div>
+  <label>Password</label>
+  <input type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" />
 
-    <button class="btn primary full" (click)="submit()" [disabled]="loading()">Create account</button>
-    <div class="muted small">Have an account? <a routerLink="/login" class="link">Login</a></div>
-  </div>
+  <button (click)="register()" [disabled]="loading()">Create account</button>
+
+  <p>
+    Already have an account?
+    <a routerLink="/login">Login</a>
+  </p>
 </div>

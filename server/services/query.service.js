@@ -1,47 +1,128 @@
 const QueryRun = require("../models/QueryRun");
-const { runCryptoOrNumberQuery } = require("./queryCrypto.service");
-const { runSympyQuery } = require("./querySympy.service");
-const { fetchWikiSummary } = require("./wiki.service");
 
-function detectModule(raw) {
-  const q = raw.toLowerCase();
-  if (q.startsWith("wiki ")) return "wiki";
-  if (q.startsWith("gcd ") || q.startsWith("modexp ") || q.startsWith("hash ")) return "crypto";
-  if (q.startsWith("eval ") || q.startsWith("simplify ") || q.startsWith("solve ") || q.startsWith("factor ")
-   || q.startsWith("expand ") || q.startsWith("derive ") || q.startsWith("integral ") || q.startsWith("limit ")
-   || q.startsWith("plot ")) return "math";
-  return "unknown";
+function gcd(a, b) {
+  a = Number(a); b = Number(b);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+  a = Math.trunc(a); b = Math.trunc(b);
+  while (b !== 0) [a, b] = [b, a % b];
+  return Math.abs(a);
+}
+
+function primeFactors(n) {
+  n = Number(n);
+  if (!Number.isFinite(n)) return null;
+  n = Math.trunc(n);
+  if (n === 0) return [0];
+  n = Math.abs(n);
+  if (n === 1) return [1];
+
+  const factors = [];
+  let d = 2;
+  while (n > 1 && d * d <= n) {
+    while (n % d === 0) {
+      factors.push(d);
+      n = Math.trunc(n / d);
+    }
+    d++;
+  }
+  if (n > 1) factors.push(n);
+  return factors;
+}
+
+function evaluateExpression(expr) {
+  try {
+    const s = String(expr).trim();
+    // dopuštamo samo brojeve, razmake i matemat. operatore
+    // ^ podržimo kao potenciju
+    if (!/^[0-9+\-*/().^ \t]+$/.test(s)) return null;
+
+    const safe = s.replace(/\^/g, "**");
+    const result = Function(`"use strict"; return (${safe});`)();
+
+    if (typeof result !== "number" || !Number.isFinite(result)) return null;
+    return result;
+  } catch {
+    return null;
+  }
 }
 
 async function runQuery({ userId, rawQuery }) {
-  const started = Date.now();
-  const module = detectModule(rawQuery);
-  let status = "done", input = {}, output = {}, error = "";
+  const original = String(rawQuery || "").trim();
+  const q = original.toLowerCase().trim();
 
-  try {
-    if (module === "wiki") {
-      const term = rawQuery.slice(5).trim();
-      input = { term };
-      output = await fetchWikiSummary(term);
-    } else if (module === "crypto") {
-      const out = await runCryptoOrNumberQuery(rawQuery);
-      input = out.input; output = out.output;
-    } else if (module === "math") {
-      const out = await runSympyQuery(rawQuery);
-      input = out.input; output = out.output;
+// --- SAVE (only if logged in) ---
+let doc = {
+  userId: userId || null,
+  rawQuery: original,
+  pods,
+  createdAt: new Date(),
+};
+
+if (userId) {
+  doc = await QueryRun.create({
+    userId,
+    rawQuery: original,
+    pods,
+  });
+}
+
+return doc;
+
+  let pods = [];
+
+  // gcd a b
+  if (q.startsWith("gcd")) {
+    const parts = q.split(/\s+/);
+    const a = parts[1];
+    const b = parts[2];
+    const result = gcd(a, b);
+
+    if (result === null) {
+      pods.push({ title: "Result", type: "text", value: "Usage: gcd 120 45" });
     } else {
-      status = "error";
-      error = "Unknown command. Try: solve/derive/integral/gcd/hash/wiki";
+      pods.push({ title: "Result", type: "text", value: String(result) });
+      pods.push({ title: "Properties", type: "keyvalue", value: { a: Number(a), b: Number(b) } });
     }
-  } catch (e) {
-    status = "error";
-    error = e.message || String(e);
+  }
+
+  // factor n
+  else if (q.startsWith("factor")) {
+    const parts = q.split(/\s+/);
+    const n = parts[1];
+    const factors = primeFactors(n);
+
+    if (!factors) {
+      pods.push({ title: "Result", type: "text", value: "Usage: factor 360" });
+    } else if (factors.length === 1 && factors[0] === 1) {
+      pods.push({ title: "Prime Factors", type: "text", value: "1" });
+    } else if (factors.length === 1 && factors[0] === 0) {
+      pods.push({ title: "Prime Factors", type: "text", value: "0" });
+    } else {
+      pods.push({ title: "Prime Factors", type: "text", value: factors.join(" × ") });
+      pods.push({ title: "Count", type: "text", value: String(factors.length) });
+      pods.push({ title: "Properties", type: "keyvalue", value: { n: Number(n) } });
+    }
+  }
+
+  // basic math expression
+  else {
+    const result = evaluateExpression(original);
+    if (result !== null) {
+      pods.push({ title: "Result", type: "text", value: String(result) });
+      pods.push({ title: "Input", type: "text", value: original });
+    } else {
+      pods.push({ title: "Result", type: "text", value: "I don't understand the query." });
+      pods.push({ title: "Examples", type: "text", value: "Try: gcd 120 45 | factor 360 | 2*(3+4)^2" });
+    }
   }
 
   const doc = await QueryRun.create({
-    userId, rawQuery, module, status, input, output,
-    durationMs: Date.now() - started, error
+    userId: userId || null,
+    rawQuery: original,
+    pods,
   });
+
   return doc;
 }
+
 module.exports = { runQuery };

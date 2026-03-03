@@ -14,7 +14,7 @@ export class HistoryPage{
   constructor(private hs: HistoryService){ this.load(); }
   async load(){
     this.loading.set(true); this.error.set(null);
-    try{ this.items.set(await this.hs.list() as any[]); }
+    try{ this.items.set(await this.hs.list(20) as any[]); }
     catch(e:any){ this.error.set(e?.error?.message || e?.message || 'Failed'); }
     finally{ this.loading.set(false); }
   }

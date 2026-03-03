@@ -1,0 +1,4 @@
+.page { max-width: 420px; margin: 40px auto; display: grid; gap: 10px; }
+.error { color: #b00020; }
+input { padding: 10px; }
+button { padding: 10px; }

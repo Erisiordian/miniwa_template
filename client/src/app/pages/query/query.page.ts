@@ -1,35 +1,42 @@
 import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { QueryService } from './query.service';
+import { HttpClient } from '@angular/common/http';
+import { API_BASE } from '../../core/api';
 
 @Component({
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './query.page.html',
   styleUrl: './query.page.css',
 })
 export class QueryPage {
   query = signal('');
-  activeTab = signal<'result'|'steps'|'plot'|'json'>('result');
-  lastRun = signal<any|null>(null);
   loading = signal(false);
-  error = signal<string|null>(null);
+  error = signal<string | null>(null);
 
-  constructor(private qs: QueryService) {}
-  setExample(q: string){ this.query.set(q); }
+  result = signal<any | null>(null);
+  objectKeys = Object.keys;
 
-  async run(){
-    this.error.set(null);
+  constructor(private http: HttpClient) {}
+
+  async run() {
     const q = this.query().trim();
-    if(!q) return;
+    if (!q) return;
+
     this.loading.set(true);
-    try{
-      const res = await this.qs.run(q);
-      this.lastRun.set(res);
-      this.activeTab.set('result');
-    }catch(e:any){
-      this.error.set(e?.error?.message || e?.message || 'Query failed');
-    }finally{
+    this.error.set(null);
+    this.result.set(null);
+
+    try {
+      const resp = await this.http
+        .post<any>(`${API_BASE}/query`, { query: q })
+        .toPromise();
+
+      this.result.set(resp);
+    } catch (e: any) {
+      this.error.set(e?.error?.message || e?.message || 'Failed');
+    } finally {
       this.loading.set(false);
     }
   }

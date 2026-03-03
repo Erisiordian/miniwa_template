@@ -1,55 +1,36 @@
 <div class="page">
-  <div class="hero">
-    <div>
-      <h1>Ask in commands.</h1>
-      <p>Try <span class="mono">solve x^2-5x+6=0 for x</span>.</p>
-    </div>
-    <div class="status">
-      <div class="pill">Ready</div>
-      <div class="pill muted">Math • Crypto • Wiki</div>
-    </div>
+  <h1>MiniWA</h1>
+
+  <div class="search">
+    <input
+      type="text"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      placeholder="Enter a query… e.g. gcd 120 45 | factor 360 | 2*(3+4)^2"
+    />
+    <button (click)="run()" [disabled]="loading()">Run</button>
   </div>
 
-  <div class="card">
-    <label class="label">Query</label>
-    <div class="row">
-      <input class="input mono" [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="e.g. integral sin(x) by x" />
-      <button class="btn primary" (click)="run()" [disabled]="loading()">Run</button>
-    </div>
+  <div *ngIf="loading()">Computing…</div>
+  <div *ngIf="error()" class="error">{{ error() }}</div>
 
-    <div class="chips">
-      <button class="chip" (click)="setExample('solve x^2-5x+6=0 for x')">solve</button>
-      <button class="chip" (click)="setExample('integral sin(x) by x')">integral</button>
-      <button class="chip" (click)="setExample('gcd 120 45')">gcd</button>
-      <button class="chip" (click)="setExample('wiki Fourier transform')">wiki</button>
-    </div>
+  <div *ngIf="result() as r" class="pods">
+    <div *ngFor="let pod of r.pods" class="pod">
+      <h3>{{ pod.title }}</h3>
 
-    <div class="err" *ngIf="error()">{{ error() }}</div>
-  </div>
-
-  <div class="card">
-    <div class="tabs">
-      <button class="tab" [class.active]="activeTab()==='result'" (click)="activeTab.set('result')">Result</button>
-      <button class="tab" [class.active]="activeTab()==='steps'" (click)="activeTab.set('steps')">Steps</button>
-      <button class="tab" [class.active]="activeTab()==='plot'" (click)="activeTab.set('plot')">Plot</button>
-      <button class="tab" [class.active]="activeTab()==='json'" (click)="activeTab.set('json')">JSON</button>
-    </div>
-
-    <div class="out">
-      <div class="placeholder" *ngIf="!lastRun() && !loading()">Run a query to see output.</div>
-      <div class="placeholder" *ngIf="loading()">Running…</div>
-
-      <pre class="mono pre" *ngIf="lastRun() && activeTab()==='json'">{{ lastRun() | json }}</pre>
-
-      <div *ngIf="lastRun() && activeTab()==='result'">
-        <div class="kv"><span class="k">module</span><span class="v">{{ lastRun()?.module }}</span></div>
-        <div class="kv"><span class="k">status</span><span class="v">{{ lastRun()?.status }}</span></div>
-        <div class="kv"><span class="k">result</span><span class="v mono">{{ lastRun()?.output?.result ?? (lastRun()?.output | json) }}</span></div>
-        <div class="kv" *ngIf="lastRun()?.error"><span class="k">error</span><span class="v">{{ lastRun()?.error }}</span></div>
+      <div *ngIf="pod.type === 'text'">
+        {{ pod.value }}
       </div>
 
-      <div *ngIf="lastRun() && activeTab()==='steps'" class="placeholder">Steps placeholder.</div>
-      <div *ngIf="lastRun() && activeTab()==='plot'" class="placeholder">Plot placeholder.</div>
+      <div *ngIf="pod.type === 'keyvalue'">
+        <div *ngFor="let k of objectKeys(pod.value)">
+          <b>{{ k }}:</b> {{ pod.value[k] }}
+        </div>
+      </div>
+
+      <div *ngIf="pod.type !== 'text' && pod.type !== 'keyvalue'">
+        Unsupported pod type: {{ pod.type }}
+      </div>
     </div>
   </div>
 </div>

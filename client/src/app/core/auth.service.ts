@@ -1,15 +1,28 @@
 import { Injectable, signal } from '@angular/core';
-type User = { id: string; email: string };
+
+const TOKEN_KEY = 'miniwa_token';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private tokenSig = signal<string | null>(localStorage.getItem('token'));
-  private emailSig = signal<string | null>(localStorage.getItem('email'));
-  isAuthed(){ return !!this.tokenSig(); }
-  token(){ return this.tokenSig(); }
-  userEmail(){ return this.emailSig(); }
-  setAuth(token: string, user: User){
-    this.tokenSig.set(token); this.emailSig.set(user.email);
-    localStorage.setItem('token', token); localStorage.setItem('email', user.email);
+  private _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
+
+  token = this._token.asReadonly();
+
+  isLoggedIn() {
+    return !!this._token();
   }
-  logout(){ this.tokenSig.set(null); this.emailSig.set(null); localStorage.removeItem('token'); localStorage.removeItem('email'); }
+
+  getToken() {
+    return this._token();
+  }
+
+  setToken(token: string) {
+    localStorage.setItem(TOKEN_KEY, token);
+    this._token.set(token);
+  }
+
+  clear() {
+    localStorage.removeItem(TOKEN_KEY);
+    this._token.set(null);
+  }
 }

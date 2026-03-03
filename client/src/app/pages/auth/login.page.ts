@@ -1,29 +1,33 @@
 import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-import { API_BASE } from '../../core/api';
-import { AuthService } from '../../core/auth.service';
+import { Router } from '@angular/router';
+import { AuthApi } from '../../core/auth.api';
 
 @Component({
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.page.html',
-  styleUrl: './auth.page.css',
+  styleUrl: './login.page.css',
 })
-export class LoginPage{
-  email=signal(''); password=signal('');
-  loading=signal(false); error=signal<string|null>(null);
-  constructor(private http: HttpClient, private auth: AuthService, private router: Router){}
-  async submit(){
-    this.error.set(null); this.loading.set(true);
-    try{
-      const res:any = await firstValueFrom(this.http.post(`${API_BASE}/auth/login`, { email: this.email(), password: this.password() }));
-      this.auth.setAuth(res.token, res.user);
+export class LoginPage {
+  email = signal('');
+  password = signal('');
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+  constructor(private api: AuthApi, private router: Router) {}
+
+  async login() {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      await this.api.login(this.email().trim(), this.password());
       this.router.navigateByUrl('/history');
-    }catch(e:any){
+    } catch (e: any) {
       this.error.set(e?.error?.message || e?.message || 'Login failed');
-    }finally{ this.loading.set(false); }
+    } finally {
+      this.loading.set(false);
+    }
   }
 }
