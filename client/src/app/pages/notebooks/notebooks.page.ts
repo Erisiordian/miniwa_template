@@ -1,32 +1,59 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { NotebooksService } from './notebooks.service';
+import { RouterModule, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { API_BASE } from '../../core/api';
+
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './notebooks.page.html',
-  styleUrl: './notebooks.page.css',
+  styleUrls: ['./notebooks.page.css'],
 })
-export class NotebooksPage{
-  loading=signal(false); error=signal<string|null>(null);
-  items=signal<any[]>([]); title=signal('');
-  constructor(private ns: NotebooksService){ this.load(); }
-  async load(){
+export class NotebooksPage {
+  loading = signal(false);
+  items = signal<any[]>([]);
+  error = signal<string | null>(null);
+
+  constructor(private http: HttpClient, private router: Router) {
+    this.load();
+  }
+
+  async load() {
     this.loading.set(true); this.error.set(null);
-    try{ this.items.set(await this.ns.list() as any[]); }
-    catch(e:any){ this.error.set(e?.error?.message || e?.message || 'Failed'); }
-    finally{ this.loading.set(false); }
+    try {
+      const data = await firstValueFrom(this.http.get<any[]>(`${API_BASE}/notebooks`));
+      this.items.set(data);
+    } catch (e: any) {
+      this.error.set(e?.error?.message || e?.message || 'Failed');
+    } finally {
+      this.loading.set(false);
+    }
   }
-  async create(){
-    const t=this.title().trim(); if(!t) return;
-    this.loading.set(true);
-    try{ await this.ns.create(t); this.title.set(''); await this.load(); }
-    finally{ this.loading.set(false); }
+
+  async create() {
+    this.loading.set(true); this.error.set(null);
+    try {
+      const doc = await firstValueFrom(this.http.post<any>(`${API_BASE}/notebooks`, { title: 'New notebook', content: '' }));
+      this.router.navigateByUrl(`/notebooks/${doc._id}`);
+    } catch (e: any) {
+      this.error.set(e?.error?.message || e?.message || 'Failed');
+    } finally {
+      this.loading.set(false);
+    }
   }
-  async remove(id:string){
-    this.loading.set(true);
-    try{ await this.ns.remove(id); await this.load(); }
-    finally{ this.loading.set(false); }
+
+  async remove(id: string) {
+    if (!confirm('Delete notebook?')) return;
+    this.loading.set(true); this.error.set(null);
+    try {
+      await firstValueFrom(this.http.delete(`${API_BASE}/notebooks/${id}`));
+      await this.load();
+    } catch (e: any) {
+      this.error.set(e?.error?.message || e?.message || 'Failed');
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

@@ -8,7 +8,7 @@ import { AuthApi } from '../../core/auth.api';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.page.html',
-  styleUrl: './login.page.css',
+  styleUrls: ['./login.page.css'],
 })
 export class LoginPage {
   email = signal('');

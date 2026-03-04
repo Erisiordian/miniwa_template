@@ -5,7 +5,7 @@ import { HistoryService } from './history.service';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './history.page.html',
-  styleUrl: './history.page.css',
+  styleUrls: ['./history.page.css'],
 })
 export class HistoryPage{
   loading = signal(false);

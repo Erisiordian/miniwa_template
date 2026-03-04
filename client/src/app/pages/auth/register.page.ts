@@ -8,7 +8,7 @@ import { AuthApi } from '../../core/auth.api';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './register.page.html',
-  styleUrl: './register.page.css',
+  styleUrls: ['./register.page.css'],
 })
 export class RegisterPage {
   email = signal('');

@@ -8,7 +8,7 @@ import { API_BASE } from '../../core/api';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './query.page.html',
-  styleUrl: './query.page.css',
+  styleUrls: ['./query.page.css'],
 })
 export class QueryPage {
   query = signal('');
