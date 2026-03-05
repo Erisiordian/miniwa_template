@@ -1,0 +1,31 @@
+<div class="page">
+  <div class="top">
+    <a routerLink="/notebooks">← Back</a>
+    <div class="actions">
+      <button (click)="downloadExport()">Download JSON</button>
+      <button (click)="save()" [disabled]="loading()">Save</button>
+    </div>
+  </div>
+
+  <div *ngIf="error()" class="error">{{ error() }}</div>
+  <div *ngIf="loading()">Working…</div>
+
+  <label>Title</label>
+  <input type="text" [ngModel]="title()" (ngModelChange)="title.set($event)" />
+
+  <label>Tags (comma separated)</label>
+  <input type="text" [ngModel]="tagsText()" (ngModelChange)="tagsText.set($event)" />
+
+  <label>Content</label>
+  <textarea rows="12" [ngModel]="content()" (ngModelChange)="content.set($event)"></textarea>
+
+  <div class="attach">
+    <label>Attach a file</label>
+    <input type="file" (change)="uploadFile($event)" />
+  </div>
+
+  <h3>Attachments</h3>
+  <div class="att" *ngFor="let a of attachments()">
+    {{ a.originalName }} ({{ a.size }} bytes)
+  </div>
+</div>

@@ -27,6 +27,8 @@ app.use("/api/history", require("./routes/history.routes"));
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/query", require("./routes/query.routes"));
 app.use("/api/history", require("./routes/history.routes"));
+app.use("/api/notebooks", require("./routes/notebooks.routes"));
+app.use("/uploads", express.static(require("path").join(process.cwd(), "uploads")));
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/miniwa";

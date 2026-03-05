@@ -1,10 +1,7 @@
-.page{display:grid;gap:12px}
-.head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-h2{margin:0}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.row .input{flex:1;min-width:240px}
-.muted{color:rgba(231,235,255,.75)}
-.small{font-size:13px}
-.nb{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.title{font-weight:700}
-.empty{padding:14px 0;color:rgba(231,235,255,.70)}
+.page { max-width: 900px; margin: 20px auto; padding: 0 12px; }
+.top { display:flex; justify-content: space-between; align-items:center; }
+.error { color:#b00020; margin:10px 0; }
+.list { display:grid; gap:10px; margin-top: 12px; }
+.card { border:1px solid #ddd; border-radius: 10px; padding: 12px; display:flex; gap:10px; align-items:center; justify-content: space-between; }
+.meta { opacity: .7; font-size: 12px; }
+button { padding: 8px 10px; }
