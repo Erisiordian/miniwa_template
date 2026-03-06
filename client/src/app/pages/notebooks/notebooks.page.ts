@@ -2,12 +2,13 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 import { API_BASE } from '../../core/api';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './notebooks.page.html',
   styleUrls: ['./notebooks.page.css'],
 })
@@ -15,6 +16,7 @@ export class NotebooksPage {
   loading = signal(false);
   items = signal<any[]>([]);
   error = signal<string | null>(null);
+  title = '';
 
   constructor(private http: HttpClient, private router: Router) {
     this.load();

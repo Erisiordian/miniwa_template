@@ -11,8 +11,8 @@ import { AuthService } from './core/auth.service';
 })
 export class AppComponent {
   sidebarOpen = signal(false);
-  isAuthed = computed(() => this.auth.isAuthed());
+  isAuthed = computed(() => this.auth.isLoggedIn());
   constructor(public auth: AuthService) {}
   toggleSidebar(){ this.sidebarOpen.update(v=>!v); }
-  logout(){ this.auth.logout(); }
+  logout(){ this.auth.clear(); }
 }

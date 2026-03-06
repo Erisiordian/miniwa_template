@@ -2,7 +2,7 @@
   <div class="head"><h2>Notebooks</h2></div>
   <div class="card">
     <div class="row">
-      <input class="input" placeholder="New notebook title…" [ngModel]="title()" (ngModelChange)="title.set($event)" />
+      <input class="input" placeholder="New notebook title…" [(ngModel)]="title" />
       <button class="btn primary" (click)="create()" [disabled]="loading()">Create</button>
       <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
     </div>

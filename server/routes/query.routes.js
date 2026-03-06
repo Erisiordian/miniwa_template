@@ -1,5 +1,5 @@
 const express = require("express");
-const optionalAuth = require("../middleware/optionalAuth");
+const optionalAuth = require("../middleware/OptionalAuth");
 const { runQuery } = require("../services/query.service");
 
 const router = express.Router();
