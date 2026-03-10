@@ -98,11 +98,21 @@ async function runQuery({ userId, rawQuery }) {
     }
   }
 
-  const doc = await QueryRun.create({
+  // --- SAVE (only if logged in) ---
+  let doc = {
     userId: userId || null,
     rawQuery: original,
     pods,
-  });
+    createdAt: new Date(),
+  };
+
+  if (userId) {
+    doc = await QueryRun.create({
+      userId,
+      rawQuery: original,
+      pods,
+    });
+  }
 
   return doc;
 }

@@ -1,22 +1,17 @@
 <div class="page">
-  <div class="head"><h2>Notebooks</h2></div>
-  <div class="card">
-    <div class="row">
-      <input class="input" placeholder="New notebook title…" [(ngModel)]="title" />
-      <button class="btn primary" (click)="create()" [disabled]="loading()">Create</button>
-      <button class="btn" (click)="load()" [disabled]="loading()">Refresh</button>
-    </div>
-    <div class="muted small">Export/Import su u backendu: GET /api/notebooks/:id/export i POST /api/notebooks/import</div>
+  <div class="top">
+    <h2>Notebooks</h2>
+    <button (click)="create()" [disabled]="loading()">+ New</button>
   </div>
-  <div class="card" *ngIf="error()">{{ error() }}</div>
-  <div class="card">
-    <div class="nb" *ngFor="let nb of items()">
-      <div class="left">
-        <div class="title">{{ nb.title }}</div>
-        <div class="muted small">{{ nb.updatedAt | date:'short' }}</div>
-      </div>
-      <button class="btn" (click)="remove(nb._id)" [disabled]="loading()">Delete</button>
+
+  <div *ngIf="error()" class="error">{{ error() }}</div>
+  <div *ngIf="loading()">Loading…</div>
+
+  <div class="list">
+    <div class="card" *ngFor="let nb of items()">
+      <a [routerLink]="['/notebooks', nb._id]">{{ nb.title }}</a>
+      <div class="meta">Updated: {{ nb.updatedAt | date:'short' }}</div>
+      <button (click)="remove(nb._id)">Delete</button>
     </div>
-    <div class="empty" *ngIf="items().length===0">No notebooks yet.</div>
   </div>
 </div>
