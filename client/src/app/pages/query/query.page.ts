@@ -11,6 +11,8 @@ import { API_BASE } from '../../core/api';
   styleUrls: ['./query.page.css'],
 })
 export class QueryPage {
+  status = signal("idle")
+  statusMsg = signal("")
   query = signal('');
   loading = signal(false);
   error = signal<string | null>(null);

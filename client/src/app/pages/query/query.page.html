@@ -1,36 +1,70 @@
 <div class="page">
-  <h1>MiniWA</h1>
 
-  <div class="search">
+  <!-- SEARCH BAR -->
+  <div class="search-bar">
     <input
       type="text"
       [ngModel]="query()"
       (ngModelChange)="query.set($event)"
-      placeholder="Enter a query… e.g. gcd 120 45 | factor 360 | 2*(3+4)^2"
+      placeholder="Enter a query (e.g. gcd 120 45, derive x^2, solve x^2-5*x+6=0)"
+      (keyup.enter)="run()"
     />
-    <button (click)="run()" [disabled]="loading()">Run</button>
+
+    <button (click)="run()">Compute</button>
   </div>
 
-  <div *ngIf="loading()">Computing…</div>
-  <div *ngIf="error()" class="error">{{ error() }}</div>
 
-  <div *ngIf="result() as r" class="pods">
-    <div *ngFor="let pod of r.pods" class="pod">
-      <h3>{{ pod.title }}</h3>
+  <div class="layout">
 
-      <div *ngIf="pod.type === 'text'">
-        {{ pod.value }}
-      </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
 
-      <div *ngIf="pod.type === 'keyvalue'">
-        <div *ngFor="let k of objectKeys(pod.value)">
-          <b>{{ k }}:</b> {{ pod.value[k] }}
-        </div>
-      </div>
+      <h3>Examples</h3>
 
-      <div *ngIf="pod.type !== 'text' && pod.type !== 'keyvalue'">
-        Unsupported pod type: {{ pod.type }}
-      </div>
+      <div class="example" (click)="query.set('gcd 120 45'); run()">gcd 120 45</div>
+
+      <div class="example" (click)="query.set('factor 360'); run()">factor 360</div>
+
+      <div class="example" (click)="query.set('derive x^2 + 3*x'); run()">derive x² + 3x</div>
+
+      <div class="example" (click)="query.set('integrate x^2'); run()">integrate x²</div>
+
+      <div class="example" (click)="query.set('solve x^2-5*x+6=0'); run()">solve equation</div>
+
     </div>
+
+
+    <!-- RESULT PODS -->
+    <div class="results">
+
+      <div class="status" *ngIf="status() !== 'idle'">
+        Status: {{status()}} {{statusMsg()}}
+      </div>
+
+      <div *ngFor="let pod of pods()" class="pod">
+
+        <div class="pod-title">
+          {{pod.title}}
+        </div>
+
+        <div class="pod-body">
+
+          <div *ngIf="pod.type === 'text'">
+            {{pod.value}}
+          </div>
+
+          <div *ngIf="pod.type === 'keyvalue'">
+            <div *ngFor="let k of objectKeys(pod.value)">
+              <b>{{k}}:</b> {{pod.value[k]}}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
+
 </div>
